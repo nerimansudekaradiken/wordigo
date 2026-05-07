@@ -22,7 +22,8 @@ CREATE TABLE UserProgress (
     CorrectCount INT DEFAULT 0,
     LastShownDate DATE,
     NextReviewDate DATE,
-    IsLearned BIT DEFAULT 0, 
+    IsLearned BIT DEFAULT 0,
+    WrongAnswerCount INT DEFAULT 0,
     FOREIGN KEY (UserID) REFERENCES Users(UserID),
     FOREIGN KEY (WordID) REFERENCES Words(WordID)
 );
