@@ -1,4 +1,5 @@
 📖 Proje Hakkında
+
 Wordigo, klasik kelime ezberleme yöntemlerini terk ederek modern Spaced Repetition (Aralıklı Tekrar) algoritmasını kullanan akıllı bir İngilizce kelime öğrenme sistemidir. Kullanıcıların İngilizce kelimeleri kısa süreli bellekten kalıcı hafızaya geçirebilmesi için kelimeler belirli periyotlarla (1 gün, 1 hafta, 1 ay vb.) 6 kez karşılarına çıkarılır.
 Sistem aynı zamanda kelimeleri bağlam içinde öğretmek için Generative AI (Üretken Yapay Zeka) teknolojilerinden faydalanarak kelimelere özel masalsı hikaye ve görsel oluşturur.
 
