@@ -1,0 +1,115 @@
+// login.js
+
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const submitBtn = document.querySelector('button[type="submit"]');
+
+    try {
+        const response = await fetch(CONFIG.LOGIN_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.loginSuccess) {
+            const dbUserId = data.userId || data.id;
+
+            if (!dbUserId) {
+                console.error("Kritik Hata: Backend login onayladı ama UserID dönmedi!");
+                alert("Sistem hatası: Kullanıcı kimliği doğrulanamadı. Lütfen yöneticiye bildirin.");
+                return;
+            }
+
+            localStorage.setItem("userId", dbUserId);
+            localStorage.setItem("currentUser", username);
+            localStorage.setItem("isLoggedIn", "true");
+
+            if (submitBtn) {
+                submitBtn.innerText = "Yönlendiriliyor... 🚀";
+                submitBtn.classList.remove("bg-amber-400", "hover:bg-amber-500");
+                submitBtn.style.backgroundColor = "#10b981";
+                submitBtn.disabled = true;
+            }
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 800);
+        } else {
+            alert("Hata: " + (data.message || "Kullanıcı adı veya şifre hatalı!"));
+        }
+    } catch (error) {
+        console.error("Bağlantı Hatası:", error);
+        alert("Sunucuya ulaşılamıyor! Lütfen sunucunun açık olduğunu kontrol et.");
+    }
+});
+
+// --- ŞİFREMİ UNUTTUM MODALI ---
+const forgotBtn = document.getElementById("forgotPasswordBtn");
+
+if (forgotBtn) {
+    forgotBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (document.getElementById("forgotPasswordModal")) return;
+
+        const modalHtml = `
+            <div id="forgotPasswordModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300">
+                    <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-100">
+                        <span class="text-3xl">🔑</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Şifreni mi Unuttun?</h3>
+                    <p class="text-slate-500 text-center text-sm mb-6">Kayıtlı kullanıcı adını veya e-posta adresini gir, sana sıfırlama bağlantısı gönderelim.</p>
+                    <input type="text" id="resetInput" placeholder="Kullanıcı Adı veya E-posta"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition mb-6">
+                    <div class="flex gap-3">
+                        <button id="cancelResetBtn" class="flex-1 py-3 px-4 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-xl transition border border-slate-200">İptal</button>
+                        <button id="sendResetBtn" class="flex-1 py-3 px-4 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-200 transition">Bağlantı Gönder</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+        const modal = document.getElementById("forgotPasswordModal");
+        const modalBox = modal.querySelector("div");
+
+        requestAnimationFrame(() => {
+            modal.classList.remove("opacity-0");
+            modalBox.classList.remove("scale-95");
+        });
+
+        const closeModal = () => {
+            modal.classList.add("opacity-0");
+            modalBox.classList.add("scale-95");
+            setTimeout(() => modal.remove(), 300);
+        };
+
+        document.getElementById("cancelResetBtn").addEventListener("click", closeModal);
+
+        document.getElementById("sendResetBtn").addEventListener("click", () => {
+            const inputVal = document.getElementById("resetInput").value.trim();
+            const btn = document.getElementById("sendResetBtn");
+
+            if (!inputVal) {
+                document.getElementById("resetInput").classList.add("border-red-400", "ring-red-100");
+                return;
+            }
+
+            btn.innerText = "Gönderiliyor... ⏳";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerText = "Gönderildi! ✅";
+                btn.classList.replace("bg-amber-400", "bg-green-500");
+                btn.classList.replace("hover:bg-amber-500", "hover:bg-green-600");
+                btn.classList.replace("shadow-amber-200", "shadow-green-200");
+                setTimeout(closeModal, 1500);
+            }, 1000);
+        });
+    });
+}
